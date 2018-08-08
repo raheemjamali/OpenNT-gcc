@@ -750,6 +750,9 @@ case "${target}" in
   i[[3456789]]86-*-mingw*)
     noconfigdirs="$noconfigdirs target-libffi"
     ;;
+  i[[3456789]]86-*-opennt*)
+    noconfigdirs="$noconfigdirs target-libffi"
+    ;;
   x86_64-*-mingw*)
     noconfigdirs="$noconfigdirs target-libffi"
     ;;
@@ -771,7 +774,7 @@ esac
 # Disable the go frontend on systems where it is known to not work. Please keep
 # this in sync with contrib/config-list.mk.
 case "${target}" in
-*-*-darwin* | *-*-cygwin* | *-*-mingw*)
+*-*-darwin* | *-*-cygwin* | *-*-mingw* | *-*-opennt*)
     unsupported_languages="$unsupported_languages go"
     ;;
 esac
@@ -784,7 +787,7 @@ if test x$enable_libgo = x; then
 	# PR 46986
 	noconfigdirs="$noconfigdirs target-libgo"
 	;;
-    *-*-cygwin* | *-*-mingw*)
+    *-*-cygwin* | *-*-mingw* | *-*-opennt*)
 	noconfigdirs="$noconfigdirs target-libgo"
 	;;
     esac
@@ -877,6 +880,9 @@ case "${target}" in
     noconfigdirs="$noconfigdirs target-newlib target-libgloss"
     ;; 
   *-*-mingw*)
+    noconfigdirs="$noconfigdirs target-newlib target-libgloss"
+    ;;
+  *-*-opennt*)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss"
     ;;
   *-*-netbsd*)
@@ -1052,6 +1058,9 @@ case "${target}" in
   i[[3456789]]86-*-mingw*)
     target_configdirs="$target_configdirs target-winsup"
     ;;
+  i[[3456789]]86-*-opennt*)
+    target_configdirs="$target_configdirs target-winsup"
+    ;;
   *-*-cygwin*)
     target_configdirs="$target_configdirs target-libtermcap target-winsup"
     noconfigdirs="$noconfigdirs target-libgloss"
@@ -1202,6 +1211,9 @@ case "${host}" in
     host_makefile_frag="config/mh-cygwin"
     ;;
   *-mingw*)
+    host_makefile_frag="config/mh-mingw"
+    ;;
+  *-opennt*)
     host_makefile_frag="config/mh-mingw"
     ;;
   alpha*-linux*)
@@ -1687,7 +1699,7 @@ ACX_ELF_TARGET_IFELSE([# ELF platforms build the lto-plugin always.
   build_lto_plugin=yes
 ],[if test x"$default_enable_lto" = x"yes" ; then
     case $target in
-      *-apple-darwin[[912]]* | *-cygwin* | *-mingw* | *djgpp*) ;;
+      *-apple-darwin[[912]]* | *-cygwin* | *-mingw* | *-opennt* | *djgpp*) ;;
       # On other non-ELF platforms, LTO has yet to be validated.
       *) enable_lto=no ;;
     esac
@@ -1698,7 +1710,7 @@ ACX_ELF_TARGET_IFELSE([# ELF platforms build the lto-plugin always.
   # warn during gcc/ subconfigure; unless you're bootstrapping with
   # -flto it won't be needed until after installation anyway.
     case $target in
-      *-cygwin* | *-mingw* | *-apple-darwin* | *djgpp*) ;;
+      *-cygwin* | *-mingw* | *-opennt* | *-apple-darwin* | *djgpp*) ;;
       *) if test x"$enable_lto" = x"yes"; then
 	AC_MSG_ERROR([LTO support is not enabled for this target.])
         fi
@@ -1708,7 +1720,7 @@ ACX_ELF_TARGET_IFELSE([# ELF platforms build the lto-plugin always.
   # Among non-ELF, only Windows platforms support the lto-plugin so far.
   # Build it unless LTO was explicitly disabled.
   case $target in
-    *-cygwin* | *-mingw*) build_lto_plugin=$enable_lto ;;
+    *-cygwin* | *-mingw* | *-opennt*) build_lto_plugin=$enable_lto ;;
     *) ;;
   esac
 ])
@@ -3154,7 +3166,7 @@ case "$target" in
   # however, use a symlink named 'mingw' in ${prefix} .
     FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET' -L${prefix}/${target}/lib -L${prefix}/mingw/lib -isystem ${prefix}/${target}/include -isystem ${prefix}/mingw/include'
     ;;
-  *-mingw*)
+  *-mingw* | *-opennt*)
   # MinGW can't be handled as Cygwin above since it does not use newlib.
     FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET' -L$$r/$(TARGET_SUBDIR)/winsup/mingw -L$$r/$(TARGET_SUBDIR)/winsup/w32api/lib -isystem $$s/winsup/mingw/include -isystem $$s/winsup/w32api/include'
     ;;
