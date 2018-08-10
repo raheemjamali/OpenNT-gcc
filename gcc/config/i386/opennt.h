@@ -18,6 +18,8 @@ You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING3.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+/* NOTE: This file is essentially mingw32.h, with all mingw-w64.h overrides applied. */
+
 #undef DEFAULT_ABI
 #define DEFAULT_ABI MS_ABI
 
@@ -70,20 +72,20 @@ along with GCC; see the file COPYING3.  If not see
 #define SUB_LINK_ENTRY64 "-e DllMainCRTStartup"
 #endif
 
+#undef SUB_LINK_SPEC
 #undef SUB_LINK_ENTRY
-#if TARGET_64BIT_DEFAULT
-#define SUB_LINK_ENTRY SUB_LINK_ENTRY64
-#else
-#define SUB_LINK_ENTRY SUB_LINK_ENTRY32
-#endif
+#define SUB_LINK_SPEC "%{" SPEC_64 ":-m i386pep} %{" SPEC_32 ":-m i386pe}"
+#define SUB_LINK_ENTRY "%{" SPEC_64 ":" SUB_LINK_ENTRY64 "} %{" SPEC_32 ":" SUB_LINK_ENTRY32 "}"
 
 #undef NATIVE_SYSTEM_HEADER_COMPONENT
 #define NATIVE_SYSTEM_HEADER_COMPONENT "MINGW"
 
+/* Enable -municode feature and support optional pthread support.  */
 #undef CPP_SPEC
 #define CPP_SPEC "%{posix:-D_POSIX_SOURCE} %{mthreads:-D_MT} " \
+		 "%{municode:-DUNICODE} " \
 		 "%{" SPEC_PTHREAD1 ":-D_REENTRANT} " \
-		 "%{" SPEC_PTHREAD2 ": } "
+		 "%{" SPEC_PTHREAD2 ":-U_REENTRANT} "
 
 /* For Windows applications, include more libraries, but always include
    kernel32.  */
@@ -93,7 +95,7 @@ along with GCC; see the file COPYING3.  If not see
 		 "%{mwindows:-lgdi32 -lcomdlg32} " \
      "%{fvtable-verify=preinit:-lvtv -lpsapi; \
         fvtable-verify=std:-lvtv -lpsapi} " \
-                 "-ladvapi32 -lshell32 -luser32 -lkernel32"
+		 "-ladvapi32 -lshell32 -luser32 -lkernel32"
 
 /* Weak symbols do not get resolved if using a Windows dll import lib.
    Make the unwind registration references strong undefs.  */
@@ -114,7 +116,8 @@ along with GCC; see the file COPYING3.  If not see
 #define SUBTARGET_EXTRA_SPECS						\
   { "shared_libgcc_undefs", SHARED_LIBGCC_UNDEFS_SPEC }
 
-#define LINK_SPEC "%{mwindows:--subsystem windows} \
+#undef LINK_SPEC
+#define LINK_SPEC SUB_LINK_SPEC " %{mwindows:--subsystem windows} \
   %{mconsole:--subsystem console} \
   %{shared: %{mdll: %eshared and mdll are not compatible}} \
   %{shared: --shared} %{mdll:--dll} \
@@ -146,7 +149,9 @@ along with GCC; see the file COPYING3.  If not see
 
 #undef STARTFILE_SPEC
 #define STARTFILE_SPEC "%{shared|mdll:dllcrt2%O%s} \
-  %{!shared:%{!mdll:crt2%O%s}} %{pg:gcrt2%O%s} \
+  %{!shared:%{!mdll:%{!municode:crt2%O%s}}} \
+  %{!shared:%{!mdll:%{municode:crt2u%O%s}}} \
+  %{pg:gcrt2%O%s} \
   crtbegin.o%s \
   %{fvtable-verify=none:%s; \
     fvtable-verify=preinit:vtv_start.o%s; \
@@ -160,6 +165,10 @@ along with GCC; see the file COPYING3.  If not see
     fvtable-verify=preinit:vtv_end.o%s; \
     fvtable-verify=std:vtv_end.o%s} \
   crtend.o%s"
+
+/* Enable multilib.  */
+#undef ASM_SPEC
+#define ASM_SPEC "%{m32:--32} %{m64:--64}"
 
 /* Override startfile prefix defaults.  */
 #ifndef STANDARD_STARTFILE_PREFIX_1
@@ -252,3 +261,19 @@ do {						         \
 #endif
 #define LIBGCC_SONAME "libgcc_s" LIBGCC_EH_EXTN "-1.dll"
 
+#undef SPEC_32
+#undef SPEC_64
+#if TARGET_64BIT_DEFAULT
+#define SPEC_32 "m32"
+#define SPEC_64 "!m32"
+#else
+#define SPEC_32 "!m64"
+#define SPEC_64 "m64"
+#endif
+
+#undef MULTILIB_DEFAULTS
+#if TARGET_64BIT_DEFAULT
+#define MULTILIB_DEFAULTS { "m64" }
+#else
+#define MULTILIB_DEFAULTS { "m32" }
+#endif

@@ -1839,15 +1839,19 @@ i[34567]86-*-mingw* | x86_64-*-mingw*)
 	esac
 	;;
 i[34567]86-*-opennt)
+	# i*86-*-opennt target uses MinGW-w64, not MinGW (which is apparently pretty much obsolete now ...)
 	tm_file="${tm_file} i386/unix.h i386/bsd.h i386/gas.h dbxcoff.h i386/cygming.h i386/opennt.h i386/mingw-stdint.h"
 	xm_file=i386/xm-opennt.h
 	c_target_objs="${c_target_objs} winnt-c.o"
 	cxx_target_objs="${cxx_target_objs} winnt-c.o"
 	target_has_targetcm="yes"
-	tmake_file="${tmake_file} t-winnt i386/t-cygming t-slibgcc"
+	need_64bit_isa=yes
+	user_headers_inc_next_post="${user_headers_inc_next_post} float.h"
+	user_headers_inc_next_pre="${user_headers_inc_next_pre} stddef.h stdarg.h"
+	tmake_file="${tmake_file} t-winnt i386/t-cygming t-slibgcc i386/t-mingw-w32"
 	native_system_header_dir=/mingw/include
 	target_gtfiles="\$(srcdir)/config/i386/winnt.c"
-	extra_options="${extra_options} i386/cygming.opt i386/mingw.opt"
+	extra_options="${extra_options} i386/cygming.opt i386/mingw.opt i386/mingw-w64.opt"
 	extra_objs="${extra_objs} winnt.o winnt-stubs.o"
 	c_target_objs="${c_target_objs} msformat-c.o"
 	cxx_target_objs="${cxx_target_objs} winnt-cxx.o msformat-c.o"

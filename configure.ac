@@ -1059,7 +1059,6 @@ case "${target}" in
     target_configdirs="$target_configdirs target-winsup"
     ;;
   i[[3456789]]86-*-opennt*)
-    target_configdirs="$target_configdirs target-winsup"
     ;;
   *-*-cygwin*)
     target_configdirs="$target_configdirs target-libtermcap target-winsup"
@@ -3166,9 +3165,14 @@ case "$target" in
   # however, use a symlink named 'mingw' in ${prefix} .
     FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET' -L${prefix}/${target}/lib -L${prefix}/mingw/lib -isystem ${prefix}/${target}/include -isystem ${prefix}/mingw/include'
     ;;
-  *-mingw* | *-opennt*)
+  *-mingw*)
   # MinGW can't be handled as Cygwin above since it does not use newlib.
     FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET' -L$$r/$(TARGET_SUBDIR)/winsup/mingw -L$$r/$(TARGET_SUBDIR)/winsup/w32api/lib -isystem $$s/winsup/mingw/include -isystem $$s/winsup/w32api/include'
+    ;;
+  *-opennt*)
+  # MinGW-w64 does not use newlib, nor does it use winsup. It may,
+  # however, use a symlink named 'mingw' in ${prefix} .
+    FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET' -L${prefix}/${target}/lib -L${prefix}/mingw/lib -isystem ${prefix}/${target}/include -isystem ${prefix}/mingw/include'
     ;;
 esac
 
