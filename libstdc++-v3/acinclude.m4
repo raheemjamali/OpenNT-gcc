@@ -2084,7 +2084,7 @@ AC_DEFUN([GLIBCXX_CHECK_RANDOM_TR1], [
   ## For MSys environment the test above is detect as false-positive
   ## on mingw-targets.  So disable it explicit for them.
       case ${target_os} in
-	*mingw*) glibcxx_cv_random_tr1=no ;;
+	*mingw* | *opennt*) glibcxx_cv_random_tr1=no ;;
 	*) glibcxx_cv_random_tr1=yes ;;
       esac
     else
@@ -2744,7 +2744,7 @@ AC_DEFUN([GLIBCXX_ENABLE_VTABLE_VERIFY], [
   vtv_cygmin=no
   if test $enable_vtable_verify = yes; then
     case ${target_os} in
-      cygwin*|mingw32*)
+      cygwin* | mingw32* | opennt*)
         VTV_CXXFLAGS="-fvtable-verify=std -Wl,-lvtv,-u_vtable_map_vars_start,-u_vtable_map_vars_end"
         VTV_CXXLINKFLAGS="-L${toplevel_builddir}/libvtv/.libs -Wl,--rpath -Wl,${toplevel_builddir}/libvtv/.libs"
         vtv_cygmin=yes

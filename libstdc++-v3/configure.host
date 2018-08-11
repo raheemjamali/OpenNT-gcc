@@ -286,6 +286,10 @@ case "${host_os}" in
     esac
     OPT_LDFLAGS="${OPT_LDFLAGS} \$(lt_host_flags)"
     ;;
+  opennt*)
+    os_include_dir="os/mingw32-w64"
+	error_constants_dir="os/mingw32-w64"
+	OPT_LDFLAGS="${OPT_LDFLAGS} \$(lt_host_flags)";
   netbsd*)
     os_include_dir="os/bsd/netbsd"
     ;;
